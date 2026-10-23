@@ -69,7 +69,7 @@
   @keyframes shake{25%{translate:-10px 0}75%{translate:10px 0}}
 
   /* Final */
-  #final{background:var(--peach) url('love.png') center bottom/contain no-repeat; justify-content:flex-start; padding-top:7vh}
+  #final{background:var(--peach); justify-content:center}
   #final h1{font-family:'Caveat',cursive; font-size:clamp(3.4rem,15vw,7rem); color:#2b1a1a; margin:0}
 
   .heart{position:fixed; top:-30px; z-index:15; pointer-events:none; animation:fall linear forwards}
@@ -121,7 +121,7 @@
 
 <!-- 4. Password -->
 <section class="page center" id="pwPage">
-  <p class="msg" id="pwText">Anik’s secret</p>
+  <p class="msg" id="pwText"></p>
   <div class="row">
     <input id="pw" type="password" autocomplete="off" aria-label="Password" placeholder="">
     <button class="btn" id="open">Open</button>
@@ -131,7 +131,7 @@
 
 <!-- 5. Final -->
 <section class="page" id="final">
-  <h1>I love you</h1>
+  <h1>Anik’s secret</h1>
 </section>
 
 <script>
@@ -168,7 +168,7 @@ $('heartBtn').onclick = () => { go('pwPage'); $('pw').focus(); };
 // 4 -> 5
 function check(){
   if ($('pw').value.trim().toUpperCase() === PASSWORD.toUpperCase()){
-    go('final'); rain();
+    go('final');
   } else {
     $('err').textContent = 'Not quite. Try again!';
     $('pw').classList.remove('shake'); void $('pw').offsetWidth; $('pw').classList.add('shake');
