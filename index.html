@@ -121,11 +121,9 @@
 
 <!-- 4. Password -->
 <section class="page center" id="pwPage">
-  <div style="font-size:3.4rem">🔒</div>
-  <h2>Last step</h2>
-  <p class="msg">Type the secret word to open it.</p>
+  <p class="msg" id="pwText">Anik’s secret</p>
   <div class="row">
-    <input id="pw" type="password" autocomplete="off" aria-label="Secret word" placeholder="••••">
+    <input id="pw" type="password" autocomplete="off" aria-label="Password" placeholder="">
     <button class="btn" id="open">Open</button>
   </div>
   <div id="err" role="status"></div>
@@ -137,7 +135,7 @@
 </section>
 
 <script>
-const PASSWORD = "CHAD";   // not case-sensitive
+const PASSWORD = "7890";   // not case-sensitive
 const $ = id => document.getElementById(id);
 const go = id => {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
