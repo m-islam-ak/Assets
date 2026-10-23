@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy Birthday!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{ --plum:#5b2a6e; --pink:#e86fa6; --soft:#fff; --peach:#f0cdc2; }
+  *{box-sizing:border-box}
+  html,body{height:100%; margin:0}
+  body{
+    font-family:'Fredoka',system-ui,sans-serif; color:var(--plum);
+    background:#fbe8ff url('assets/bg.png') center/cover no-repeat fixed;
+  }
+  .page{
+    position:fixed; inset:0; overflow-y:auto; display:flex; flex-direction:column; align-items:center;
+    padding:28px 22px 120px; text-align:center; opacity:0; visibility:hidden; transition:opacity .6s, visibility .6s;
+  }
+  .page.active{opacity:1; visibility:visible}
+  .center{justify-content:center}
+  h1,h2{margin:0 0 .4em; line-height:1.15; font-weight:600}
+  h2{font-size:clamp(1.7rem,6.5vw,2.8rem)}
+  .script{font-family:'Caveat',cursive; font-size:clamp(1.6rem,6vw,2.3rem); color:var(--pink)}
+
+  .btn{
+    font:inherit; font-size:1.25rem; font-weight:600; padding:12px 34px; border-radius:999px; border:0; cursor:pointer;
+    background:var(--pink); color:#fff; transition:transform .2s;
+  }
+  .btn:hover{transform:scale(1.06)}
+  .btn.alt{background:#fff; color:var(--plum); border:3px solid var(--pink)}
+  .btn:focus-visible,input:focus-visible,.heartBtn:focus-visible{outline:3px solid var(--plum); outline-offset:3px}
+  .row{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:20px}
+
+  /* Page 0 + video */
+  #video{width:min(92vw,560px); border-radius:22px; border:5px solid #fff; background:#000; display:none}
+  #gate .big{font-size:4.5rem; animation:bob 2s ease-in-out infinite}
+  @keyframes bob{50%{translate:0 -10px}}
+
+  /* Page 2: message */
+  .photo{
+    width:min(78vw,340px); margin:6px 0 22px; border-radius:20px; border:6px solid #fff;
+    transform:rotate(-2deg); animation:floaty 4s ease-in-out infinite; display:block;
+  }
+  @keyframes floaty{50%{translate:0 -10px; rotate:1.5deg}}
+  .msg{max-width:34rem; font-size:clamp(1.05rem,3.8vw,1.3rem); line-height:1.6; margin:0 0 14px}
+  .line{opacity:0; transform:translateY(14px)}
+  .page.active .line{animation:rise .9s forwards}
+  @keyframes rise{to{opacity:1; transform:none}}
+
+  .heartBtn{
+    position:fixed; right:16px; bottom:16px; z-index:20; display:flex; flex-direction:column; align-items:center; gap:4px;
+    background:#fff; border:3px solid var(--pink); border-radius:24px; padding:10px 14px; cursor:pointer;
+    font:inherit; font-weight:600; color:var(--plum); opacity:0; visibility:hidden;
+  }
+  .heartBtn.show{opacity:1; visibility:visible}
+  .heartBtn svg{width:52px; height:52px; animation:beat 1.2s infinite}
+  @keyframes beat{15%{scale:1.2}30%{scale:1}45%{scale:1.15}60%{scale:1}}
+
+  /* Password */
+  input{
+    font:inherit; font-size:1.3rem; padding:12px 18px; border-radius:999px; border:3px solid var(--pink);
+    background:#fff; color:var(--plum); width:min(70vw,260px); text-align:center; letter-spacing:.2em;
+  }
+  #err{min-height:1.6em; margin-top:14px; color:#c2306b; font-weight:600}
+  .shake{animation:shake .4s}
+  @keyframes shake{25%{translate:-10px 0}75%{translate:10px 0}}
+
+  /* Final */
+  #final{background:var(--peach) url('assets/love.png') center bottom/contain no-repeat; justify-content:flex-start; padding-top:7vh}
+  #final h1{font-family:'Caveat',cursive; font-size:clamp(3.4rem,15vw,7rem); color:#2b1a1a; margin:0}
+
+  .heart{position:fixed; top:-30px; z-index:15; pointer-events:none; animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(110vh) rotate(40deg)}}
+
+  @media (prefers-reduced-motion:reduce){
+    #gate .big,.photo,.heartBtn svg{animation:none}
+    .page.active .line{animation-duration:.01s}
+  }
+</style>
+</head>
+<body>
+
+<!-- 0. Start gate (needed so the video can play with sound) -->
+<section class="page center active" id="gate">
+  <div class="big">💌</div>
+  <h2>You have a surprise</h2>
+  <div class="row"><button class="btn" id="start">Tap to open</button></div>
+</section>
+
+<!-- 1. Video -->
+<section class="page center" id="vid">
+  <video id="video" src="assets/intro.mp4" playsinline preload="auto"></video>
+</section>
+
+<!-- 2. Yes / No -->
+<section class="page center" id="ask">
+  <h2>I made something special for you.<br>Wanna know?</h2>
+  <p class="script" id="askNote"></p>
+  <div class="row">
+    <button class="btn" id="yes">Yes</button>
+    <button class="btn alt" id="no">No</button>
+  </div>
+</section>
+
+<!-- 3. Birthday message -->
+<section class="page" id="msgPage">
+  <h2 class="line" style="animation-delay:.3s">Happy Birthday to a very special, soft-hearted person!</h2>
+  <img class="photo line" style="animation-delay:1.2s" src="assets/girl.jpg" alt="Birthday photo">
+  <p class="msg line" style="animation-delay:2.4s">Ei gurutto-purno somoytar shob kothinota kete giye tomar agami din-gulo onek shundor hok. Dhormo-kormo ebong porashonay shob shomoy bhalo koro, ei doya kori.</p>
+  <p class="msg line" style="animation-delay:4.4s">Jani tomar admission er jonno ekhon kemon kothin somoy jacche, kintu tomar ei shohor-er moto soft mon ar kothin porishrom-i tomake tomar lakkhye pouche debe.</p>
+  <p class="msg script line" style="animation-delay:6.4s">Allah tomar shob mehonot kobul koruk!</p>
+</section>
+
+<button class="heartBtn" id="heartBtn" aria-label="Go to the next surprise">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#e86fa6" d="M12 21s-8-5.2-8-11a4.6 4.6 0 0 1 8-3.1A4.6 4.6 0 0 1 20 10c0 5.800-8 11-8 11z"/></svg>
+  <span>One more</span>
+</button>
+
+<!-- 4. Password -->
+<section class="page center" id="pwPage">
+  <div style="font-size:3.4rem">🔒</div>
+  <h2>Last step</h2>
+  <p class="msg">Type the secret word to open it.</p>
+  <div class="row">
+    <input id="pw" type="password" autocomplete="off" aria-label="Secret word" placeholder="••••">
+    <button class="btn" id="open">Open</button>
+  </div>
+  <div id="err" role="status"></div>
+</section>
+
+<!-- 5. Final -->
+<section class="page" id="final">
+  <h1>I love you</h1>
+</section>
+
+<script>
+const PASSWORD = "CHAD";   // not case-sensitive
+const $ = id => document.getElementById(id);
+const go = id => {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  $(id).classList.add('active');
+  $('heartBtn').classList.toggle('show', id === 'msgPage');
+};
+
+// 0 -> 1: play the video
+const video = $('video');
+$('start').onclick = () => {
+  go('vid');
+  video.style.display = 'block';
+  video.play().catch(() => go('ask'));
+};
+video.onended = () => go('ask');
+video.onerror = () => go('ask');
+
+// 2: yes / no
+$('yes').onclick = () => go('msgPage');
+$('no').onclick = () => {
+  $('askNote').textContent = 'Hmm, wrong answer. Only one option left!';
+  $('no').remove();
+  $('yes').textContent = 'Yes 💕';
+  $('yes').style.fontSize = '1.6rem';
+};
+
+// 3 -> 4
+$('heartBtn').onclick = () => { go('pwPage'); $('pw').focus(); };
+
+// 4 -> 5
+function check(){
+  if ($('pw').value.trim().toUpperCase() === PASSWORD.toUpperCase()){
+    go('final'); rain();
+  } else {
+    $('err').textContent = 'Not quite. Try again!';
+    $('pw').classList.remove('shake'); void $('pw').offsetWidth; $('pw').classList.add('shake');
+    $('pw').select();
+  }
+}
+$('open').onclick = check;
+$('pw').addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
+
+// Falling hearts on the last page
+function rain(){
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const chars = ['💗','💖','💕','🤍'];
+  let n = 0;
+  const t = setInterval(() => {
+    const h = document.createElement('div');
+    h.className = 'heart';
+    h.textContent = chars[n % chars.length];
+    h.style.left = Math.random()*100 + 'vw';
+    h.style.fontSize = (18 + Math.random()*22) + 'px';
+    h.style.animationDuration = (5 + Math.random()*4) + 's';
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 9500);
+    if (++n > 70) clearInterval(t);
+  }, 250);
+}
+</script>
+</body>
+</html>
